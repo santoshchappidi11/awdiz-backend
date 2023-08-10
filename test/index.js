@@ -11,7 +11,7 @@ app.get("/register", Register);
 
 mongoose
   .connect(
-    "mongodb+srv://santosh:santosh123@cluster0.0tasyyd.mongodb.net/myntra"
+    "mongodb+srv://santosh:santosh123@cluster0.0tasyyd.mongodb.net/awdiz"
   )
   .then(() => {
     console.log("connected to DB...");
