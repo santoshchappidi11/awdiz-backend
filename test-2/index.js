@@ -16,7 +16,7 @@ app.post("/login", function (req, res) {
 });
 
 app.post("/register", async function (req, res) {
-  console.log(req.body, "req.body");
+  console.log(req.body, "request.body");
   const { name, surname, age, email, number, password, confirmPassword } =
     req.body;
 
@@ -28,7 +28,7 @@ app.post("/register", async function (req, res) {
   if (!password) return res.send("Password is required...");
   if (!confirmPassword) return res.send("Confirm password is required...");
   if (password !== confirmPassword)
-    return res.send("Password and Confirm Password not matched!");
+    return res.send("Password and Confirm Password does not match!");
 
   const user = new User({
     name: name,
