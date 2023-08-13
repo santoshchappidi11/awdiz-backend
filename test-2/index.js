@@ -44,6 +44,61 @@ app.post("/register", async function (req, res) {
   res.send("Registration done successfully!");
 });
 
+app.get("/find", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) return res.send("Email not found!");
+
+  const user = await User.find({ email: email }).select("-password");
+  if (user.length) {
+    return res.send(user[0]);
+  }
+  return res.send("No user found!");
+});
+
+app.patch("/update/:id", async (req, res) => {
+  const { age, number } = req.body;
+  const { id } = req.params;
+
+  if (!id) return res.send("Id is required!");
+  if (!age) return res.send("Age is required!");
+  if (!number) return res.send("Number is required!");
+
+  const updateUser = await User.findByIdAndUpdate(
+    id,
+    { age, number },
+    { new: true }
+  ).select("-password");
+
+  return res.json({ message: "Updated User", data: updateUser });
+});
+
+app.put("/update/:id", async (req, res) => {
+  const { name, surname } = req.body;
+  const { id } = req.params;
+
+  if (!id) return res.send("Id is required!");
+  if (!name) return res.send("name is required!");
+  if (!surname) return res.send("surname is required!");
+
+  const updateUser = await User.findByIdAndUpdate(
+    id,
+    { name, surname },
+    { new: true }
+  ).select("-password");
+
+  return res.json({ message: "Updated User", data: updateUser });
+});
+
+app.delete("/delete", async (req, res) => {
+  const { id } = req.body;
+
+  if (!id) return res.send("name is required!");
+
+  const deleteUser = await User.findByIdAndDelete(id);
+  return res.json({ message: "User Deleted", data: deleteUser });
+});
+
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => {
