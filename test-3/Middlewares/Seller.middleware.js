@@ -23,7 +23,7 @@ export const checkSeller = async (req, res, next) => {
     if (!user || user.role != "Seller")
       return res
         .status(404)
-        .json({ status: "error", message: "Not a valid user to add product" });
+        .json({ status: "error", message: "Not a valid user!" });
 
     next();
   } catch (error) {
