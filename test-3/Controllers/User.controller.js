@@ -4,8 +4,8 @@ import jwt from "jsonwebtoken";
 
 export const Register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password)
+    const { name, email, password, role } = req.body;
+    if (!name || !email || !password || !role)
       return res.json({ status: "error", message: "All fields are required!" });
 
     const isUserEmailExist = await UserModel.find({ email: email });
@@ -18,7 +18,7 @@ export const Register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = new UserModel({ name, email, password: hashedPassword });
+    const user = new UserModel({ name, email, password: hashedPassword, role });
     await user.save();
     return res.json({
       status: "success",
@@ -58,5 +58,44 @@ export const Login = async (req, res) => {
     return res.json({ status: "error", message: "Password is wrong" });
   } catch (error) {
     return res.json({ status: "error", message: error });
+  }
+};
+
+export const getCurrentUser = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token)
+      return res
+        .status(404)
+        .json({ status: "error", message: "Token is required!" });
+
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!decodedData)
+      return res
+        .status(404)
+        .json({ status: "error", message: "Not a valid json token!" });
+
+    // return res.send(decodedData);
+
+    const userId = decodedData?.userId;
+
+    const user = await UserModel.findById(userId);
+
+    if (!user)
+      return res
+        .status(404)
+        .json({ status: "error", message: "User not found!" });
+
+    const userObj = {
+      name: user?.name,
+      email: user?.email,
+      _id: user?._id,
+    };
+
+    return res.status(200).json({ status: "Success", user: userObj });
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error });
   }
 };
