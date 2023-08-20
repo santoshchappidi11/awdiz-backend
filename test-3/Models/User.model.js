@@ -24,6 +24,10 @@ const userSchema = new Schema({
   wishlist: {
     type: [String],
   },
+  isBlocked: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 export default mongoose.model("User", userSchema);

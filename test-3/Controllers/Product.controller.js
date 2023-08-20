@@ -1,5 +1,6 @@
 import ProductModel from "../Models/Product.model.js";
 import jwt from "jsonwebtoken";
+import UserModel from "../Models/User.model.js";
 
 export const addProduct = async (req, res) => {
   try {
@@ -135,5 +136,65 @@ export const deleteYourProduct = async (req, res) => {
     throw new Error("MongoDB error!");
   } catch (error) {
     return res.status(500).json({ status: "error", error: error.message });
+  }
+};
+
+export const addRating = async (req, res) => {
+  try {
+    const { rating, productId } = req.body;
+
+    if (rating > 5) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Not a valid rating!" });
+    }
+
+    const addedRatingToProduct = await ProductModel.findByIdAndUpdate(
+      productId,
+      { $push: { ratings: rating } },
+      { new: true }
+    );
+
+    if (addedRatingToProduct) {
+      return res.status(200).json({
+        success: true,
+        message: "Rating added successfully!",
+        product: addedRatingToProduct,
+      });
+    }
+
+    throw new Error("MongoDb error!");
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error });
+  }
+};
+
+export const addComments = async (req, res) => {
+  try {
+    const { comment, productId, userId } = req.body;
+
+    const user = await UserModel.findById(userId);
+
+    const addedcommentToProduct = await ProductModel.findByIdAndUpdate(
+      productId,
+      {
+        $push: {
+          comments: { comments: comment, name: user.name, userId: userId },
+        },
+      },
+      { new: true }
+    );
+
+    if (addedcommentToProduct) {
+      return res.status(200).json({
+        success: true,
+        message: "comment added successfully!",
+        product: addedcommentToProduct,
+      });
+    }
+
+    throw new Error("MongoDb error!");
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: "server error" });
   }
 };

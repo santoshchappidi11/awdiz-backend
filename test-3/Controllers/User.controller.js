@@ -8,11 +8,18 @@ export const Register = async (req, res) => {
     if (!name || !email || !password || !role)
       return res.json({ status: "error", message: "All fields are required!" });
 
-    const isUserEmailExist = await UserModel.find({ email: email });
-    if (isUserEmailExist.length) {
+    const userLogged = await UserModel.find({ email });
+    if (userLogged.length) {
       return res.json({
-        status: "error",
+        success: false,
         message: "This email already exists, try different email!",
+      });
+    }
+
+    if (userLogged.isBlocked) {
+      return res.json({
+        success: false,
+        message: "You have been blocked!",
       });
     }
 
@@ -99,3 +106,4 @@ export const getCurrentUser = async (req, res) => {
     return res.status(500).json({ status: "error", message: error });
   }
 };
+
