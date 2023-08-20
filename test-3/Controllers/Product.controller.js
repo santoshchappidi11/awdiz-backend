@@ -103,12 +103,36 @@ export const updateYourProduct = async (req, res) => {
         .status(200)
         .json({ status: "success", product: updatedProduct });
 
-    return res
-      .status(404)
-      .json({
-        status: "error",
-        message: "you are trying to update product which is not yours",
-      });
+    return res.status(404).json({
+      status: "error",
+      message: "you are trying to update product which is not yours",
+    });
+  } catch (error) {
+    return res.status(500).json({ status: "error", error: error.message });
+  }
+};
+
+export const deleteYourProduct = async (req, res) => {
+  try {
+    const { token, productId } = req.body;
+
+    if (!token || !productId)
+      throw new Error("Token and Product Id is required!");
+
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+
+    const userId = decodedData.userId;
+
+    const isProductDeleted = await ProductModel.findOneAndDelete({
+      _id: productId,
+      userId: userId,
+    });
+
+    if (isProductDeleted) {
+      return res.status(200).json({ success: true, product: isProductDeleted });
+    }
+
+    throw new Error("MongoDB error!");
   } catch (error) {
     return res.status(500).json({ status: "error", error: error.message });
   }

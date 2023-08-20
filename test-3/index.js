@@ -9,10 +9,18 @@ import {
 import {
   addProduct,
   allProducts,
+  deleteYourProduct,
   getYourProducts,
   updateYourProduct,
 } from "./Controllers/Product.controller.js";
 import { checkSeller } from "./Middlewares/Seller.middleware.js";
+import {
+  getWishlistProducts,
+  addToCart,
+  addToWishlist,
+  getCartProducts,
+  removeCartProduct,
+} from "./Controllers/Buyer.controller.js";
 
 const app = express();
 app.use(express.json());
@@ -35,6 +43,14 @@ app.get("/all-products", allProducts);
 app.get("/get-your-products", checkSeller, getYourProducts);
 
 app.patch("/update-your-product", checkSeller, updateYourProduct);
+app.delete("/delete-your-product", checkSeller, deleteYourProduct);
+
+app.post("/add-to-cart", addToCart);
+app.get("/get-cart-products", getCartProducts);
+app.delete("/remove-cart-product", removeCartProduct);
+
+app.post("/add-to-wishlist", addToWishlist);
+app.get("/get-wishlist-products", getWishlistProducts);
 
 mongoose
   .connect(process.env.MONGO_URL)
